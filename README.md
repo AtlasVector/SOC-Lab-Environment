@@ -17,6 +17,6 @@ This approach creates continuous opportunities to build understanding and confid
 
 ---
 
-## 2. High-Level Architecture
+## Environment Overview
+<img src="/resources/SOC-Lab-Environment.png" />
 
-<img src="/Personal%20Projects/resources/Lab-Environment.png" />
