@@ -18,5 +18,23 @@ This approach creates continuous opportunities to build understanding and confid
 ---
 
 ## Environment Overview
+The lab is hosted on a single Proxmox VE node and is composed of multiple virtual machines with clearly defined responsibilities. Services are intentionally separated to support troubleshooting, safe experimentation, and easier understanding of system behavior.
+
+The environment includes:
+- Network routing and control
+- Segmented internal networks
+- Traffic monitoring and inspection
+- Centralized logging and analysis
+- Windows-based infrastructure
+- A testing host for experimentation
+  
 <img src="/resources/SOC-Lab-Environment.png" />
 
+From an infrastructure perspective, the lab is built around two primary network zones:
+
+- A WAN-facing network (`192.168.50.0/24`) connected via the `vmbr0` Linux bridge  
+- An internal lab network (`10.10.10.0/24`) connected via the `vmbr1` Linux bridge and further segmented using VLANs  
+
+The Proxmox host uses standard Linux bridges to connect virtual machines to these networks. This approach provides a simple and transparent networking model, which was helpful during the initial design and troubleshooting phases.
+
+During later stages of the lab, I discovered that Linux bridges alone are not ideal for traditional port mirroring or SPAN traffic duplication. This limitation introduced challenges when attempting to provide reliable network visibility to the IDS. These challenges were solved  by implementing traffic mirroring using `tc` (traffic control), which allows packets to be mirrored at the bridge level. The details of this solution are documented in a later section.
