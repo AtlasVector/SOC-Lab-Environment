@@ -49,11 +49,11 @@ The internal lab network is further segmented using VLANs, which are trunked ove
 ### Internal Network Segmentation
 The following internal networks are defined:
 - **VLAN 10 (vtnet1.10) – EmployeesVLAN10 
-  Subnet: `10.10.10.0/24` 
-  Subnet Range `10.10.10.1` - `10.10.10.254`
-  Gateway: `10.10.10.254`  
-  DHCP range: `10.10.10.10 - 10.10.10.30
-- DNS Server: 10.10.10.254
+	- Subnet: `10.10.10.0/24` 
+	- Subnet Range `10.10.10.1` - `10.10.10.254`
+	- Gateway: `10.10.10.254`
+	- DHCP range: `10.10.10.10 - 10.10.10.30
+	- DNS Server: 10.10.10.254
   Purpose: Windows workstations and user activity
 
 - **VLAN 20 – SERVERSLAN**  
