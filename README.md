@@ -94,6 +94,7 @@ This design allows traffic between internal segments to be explicitly routed and
 
 <img src="/resources/Pfsense-net.png" />
 ## Traffic Visibility & Mirroring (`tc`)
+Ensuring reliable network visibility was one of the main challenges in this lab. While standard Linux bridges (`vmbr0`, `vmbr1`) provide a simple and transparent networking model, they do not offer native support for traditional port mirroring or SPAN.
 
 To solve that, traffic mirroring was implemented on the Proxmox host using Linux **traffic control (`tc`)**. This allows packets traversing the internal bridge (`vmbr1`) to be mirrored to a dedicated monitoring interface.
 
