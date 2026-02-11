@@ -48,36 +48,37 @@ At the Proxmox level, the environment is built around two primary Linux bridges:
 The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
 ### Internal Network Segmentation
 The following internal networks are defined:
-- **VLAN 10 (vtnet1.10) – EmployeesVLAN10 
-	- Subnet: `10.10.10.0/24` 
-	- Subnet Range `10.10.10.1` - `10.10.10.254`
-	- Gateway: `10.10.10.254`
-	- DHCP range: `10.10.10.10 - 10.10.10.30
-	- DNS Server: 10.10.10.254
-  Purpose: Windows workstations and user activity
 
-- **VLAN 20 – SERVERSLAN**  
-  Subnet: `10.10.20.0/24`  
-  Subnet Range `10.10.20.1` - `10.10.20.254`
-  Gateway: `10.10.20.254`  
-  DHCP range: `10.10.20.10 - 10.10.20.30
-  Purpose: Server-side services and infrastructure
+**VLAN 10 (vtnet1.10) – EmployeesVLAN10** 
+	- **Subnet**: `10.10.10.0/24` 
+	- **Subnet Range:** `10.10.10.1` - `10.10.10.254`
+	- **Gateway:** `10.10.10.254`
+	- **DHCP range:** `10.10.10.10 - 10.10.10.30
+	- **DNS Server:** 1`0.10.10.254`
+**Purpose:** Windows workstations and user activity
 
-- **VLAN 30 – MANAGEMENTLAN**  
-  Subnet: `10.10.30.0/24` 
-  Subnet Range `10.10.30.1` - `10.10.30.254`
-  Gateway: `10.10.30.254`  
-  DHCP range: `10.10.30.10 - 10.10.30.30 
-  Purpose: Management, monitoring, and security components
+**VLAN 20 (vtnet1.20)– ServerVLAN20**
+	- **Subnet:** `10.10.20.0/24`
+	- **Subnet Range:** `10.10.20.1` - `10.10.20.254`
+	- **Gateway:** `10.10.20.254`
+	- **DHCP range:** `10.10.20.10`- `10.10.20.30`
+**Purpose:** Server-side services and infrastructure
+
+**VLAN 30 (vtnet1.30)– ManegmentVLAN30**
+	- **Subnet:** `10.10.30.0/24`
+	- **Subnet Range:** `10.10.30.1` - `10.10.30.254`
+	- **Gateway:** `10.10.30.254`
+	- **DHCP range:** `10.10.30.10 - 10.10.30.30
+	- **Purpose:** Management, monitoring, and security components
 
 In addition to VLAN-based segmentation, a dedicated network is used for testing and attack simulation:
 
-- **ATTACKERLAN40**  
-  Subnet: `10.10.40.0/24`  
-  Gateway: `10.10.40.254`  
-  Connection type: Dedicated pfSense interface (`vtnet2`)  
-  DHCP range: 10.10.40.1 - 10.10.40.40 
-  Purpose: Isolated testing host for attack and detection validation
+**ATTACKERLAN40**  
+	- **Subnet:** `10.10.40.0/24`
+	- **Gateway:** `10.10.40.254`
+	- **Connection type:** Dedicated pfSense interface (`vtnet2`)
+	- **DHCP range:** 10.10.40.1 - 10.10.40.40
+	- **Purpose:** Isolated testing host for attack and detection validation
 ### Firewall & Routing
 pfSense acts as the central routing and control point for the lab. All internal networks are routed through pfSense, making it responsible for:
 - Inter-VLAN routing
