@@ -48,22 +48,26 @@ At the Proxmox level, the environment is built around two primary Linux bridges:
 The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
 ### Internal Network Segmentation
 The following internal networks are defined:
-- **VLAN 10 – EMPLOYEESLAN**  
-  Subnet: `10.10.10.0/24`  
+- **VLAN 10 (vtnet1.10) – EmployeesVLAN10 
+  Subnet: `10.10.10.0/24` 
+  Subnet Range `10.10.10.1` - `10.10.10.254`
   Gateway: `10.10.10.254`  
-  DHCP range: `[PLACEHOLDER – confirm range]`  
+  DHCP range: `10.10.10.10 - 10.10.10.30
+- DNS Server: 10.10.10.254
   Purpose: Windows workstations and user activity
 
 - **VLAN 20 – SERVERSLAN**  
   Subnet: `10.10.20.0/24`  
+  Subnet Range `10.10.20.1` - `10.10.20.254`
   Gateway: `10.10.20.254`  
-  DHCP range: `[PLACEHOLDER – confirm range]`  
+  DHCP range: `10.10.20.10 - 10.10.20.30
   Purpose: Server-side services and infrastructure
 
 - **VLAN 30 – MANAGEMENTLAN**  
-  Subnet: `10.10.30.0/24`  
+  Subnet: `10.10.30.0/24` 
+  Subnet Range `10.10.30.1` - `10.10.30.254`
   Gateway: `10.10.30.254`  
-  DHCP range: `[PLACEHOLDER – confirm range]`  
+  DHCP range: `10.10.30.10 - 10.10.30.30 
   Purpose: Management, monitoring, and security components
 
 In addition to VLAN-based segmentation, a dedicated network is used for testing and attack simulation:
@@ -72,7 +76,7 @@ In addition to VLAN-based segmentation, a dedicated network is used for testing 
   Subnet: `10.10.40.0/24`  
   Gateway: `10.10.40.254`  
   Connection type: Dedicated pfSense interface (`vtnet2`)  
-  DHCP range: `[PLACEHOLDER – confirm range]`  
+  DHCP range: 10.10.40.1 - 10.10.40.40 
   Purpose: Isolated testing host for attack and detection validation
 ### Firewall & Routing
 pfSense acts as the central routing and control point for the lab. All internal networks are routed through pfSense, making it responsible for:
@@ -80,11 +84,6 @@ pfSense acts as the central routing and control point for the lab. All internal 
 - Enforcing network isolation
 - Applying firewall policies
 - Serving as the default gateway for all segments
-
-pfSense is connected to:
-- The WAN network via `vtnet0`
-- The internal lab network via `vtnet1` (VLAN trunk)
-- The attacker network via a dedicated interface (`vtnet2`)  
 
 This design allows traffic between internal segments to be explicitly routed and filtered, while also supporting controlled testing of lateral movement, isolation boundaries, and monitoring coverage.
 
@@ -111,3 +110,4 @@ To ensure the mirroring remains active after host reboots, the configuration was
 As a future improvement, the lab will explore **Open vSwitch (OVS)** to evaluate its native SPAN and mirroring capabilities compared to the current tc-based solution.
 
 <img src="/resources/systemd-tc-mirror.png" />
+
