@@ -30,12 +30,6 @@ The environment includes:
 
 <img src="/resources/SOC-Lab-Environment.png" />
 
-From an infrastructure perspective, the lab is built around two primary network zones:
-- A WAN-facing network (`192.168.50.0/24`)
-- An internal lab network (`10.10.10.0/24`), further segmented using VLANs
-  
-<img src="/resources/PVE-NICs.png" />
-
 ## Network Design, Segmentation & Routing
 The lab network is designed to support isolation, controlled communication, and experimentation with visibility and access boundaries. Segmentation is implemented using a combination of Linux bridges, VLANs, and a central firewall/router.
 
@@ -48,6 +42,8 @@ At the Proxmox level, the environment is built around two primary Linux bridges:
 - **`vmbr1` – Internal lab bridge**  
   Subnet: `10.10.10.0/24`  
   Purpose: Carries internal lab traffic and VLANs  
+
+<img src="/resources/PVE-NICs.png" />
 
 The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
 ### Internal Network Segmentation
@@ -93,11 +89,25 @@ pfSense is connected to:
 This design allows traffic between internal segments to be explicitly routed and filtered, while also supporting controlled testing of lateral movement, isolation boundaries, and monitoring coverage.
 
 <img src="/resources/Pfsense-net.png" />
-## Traffic Visibility & Mirroring (`tc`)
-Ensuring reliable network visibility was one of the main challenges in this lab. While standard Linux bridges (`vmbr0`, `vmbr1`) provide a simple and transparent networking model, they do not offer native support for traditional port mirroring or SPAN.
 
-To solve that, traffic mirroring was implemented on the Proxmox host using Linux **traffic control (`tc`)**. This allows packets traversing the internal bridge (`vmbr1`) to be mirrored to a dedicated monitoring interface.
+## Traffic Mirroring and Network Visibility
+  
+While attempting to mirror SPAN traffic to the Suricata IDS, it became apparent that **standard Linux bridges in Proxmox do not support native port mirroring**. This limitation surfaced during testing rather than design, requiring an alternative approach to maintain full network visibility.
 
-The mirroring configuration is applied at the bridge level and made persistent using a `systemd service`, ensuring visibility is maintained across reboots.
+As a workaround, traffic mirroring was implemented at the **virtual NIC (tap interface) level** using Linux **traffic control (`tc`)**. This allowed ingress traffic from the monitored VM interface to be mirrored directly to the Suricata monitoring interface.
 
-As a next improvement, the lab will be extended to experiment with **Open vSwitch (OVS)** as an alternative approach to traffic mirroring and network visibility.
+<img src="/resources/tc-mirroring.png" />
+
+To confirm that traffic was successfully mirrored to the correct interface on the Suricata VM, packet capture was performed directly on the monitoring interface.  
+
+In this lab, the Suricata monitoring interface is `enp6s19`. Visibility was verified using:
+
+```Bash
+sudo tcpdump -i enp6s19
+```
+
+To ensure the mirroring remains active after host reboots, the configuration was wrapped in a **systemd service** on the Proxmox host.
+
+As a future improvement, the lab will explore **Open vSwitch (OVS)** to evaluate its native SPAN and mirroring capabilities compared to the current tc-based solution.
+
+<img src="/resources/systemd-tc-mirror.png" />
