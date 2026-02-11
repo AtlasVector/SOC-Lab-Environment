@@ -25,16 +25,78 @@ The environment includes:
 - Segmented internal networks
 - Traffic monitoring and inspection
 - Centralized logging and analysis
-- Windows-based infrastructure
+- Windows based infrastructure
 - A testing host for experimentation
-  
+
 <img src="/resources/SOC-Lab-Environment.png" />
 
 From an infrastructure perspective, the lab is built around two primary network zones:
+- A WAN-facing network (`192.168.50.0/24`)
+- An internal lab network (`10.10.10.0/24`), further segmented using VLANs
+  
+<img src="/resources/PVE-NICs.png" />
 
-- A WAN-facing network (`192.168.50.0/24`) connected via the `vmbr0` Linux bridge  
-- An internal lab network (`10.10.10.0/24`) connected via the `vmbr1` Linux bridge and further segmented using VLANs  
+## Network Design, Segmentation & Routing
+The lab network is designed to support isolation, controlled communication, and experimentation with visibility and access boundaries. Segmentation is implemented using a combination of Linux bridges, VLANs, and a central firewall/router.
 
-The Proxmox host uses standard Linux bridges to connect virtual machines to these networks. This approach provides a simple and transparent networking model, which was helpful during the initial design and troubleshooting phases.
+At the Proxmox level, the environment is built around two primary Linux bridges:
 
-During later stages of the lab, I discovered that Linux bridges alone are not ideal for traditional port mirroring or SPAN traffic duplication. This limitation introduced challenges when attempting to provide reliable network visibility to the IDS. These challenges were solved  by implementing traffic mirroring using `tc` (traffic control), which allows packets to be mirrored at the bridge level. The details of this solution are documented in a later section.
+- **`vmbr0` – WAN-facing bridge**  
+  Subnet: `192.168.50.0/24`  
+  Addressing: DHCP from the upstream network  (Home Router)
+
+- **`vmbr1` – Internal lab bridge**  
+  Subnet: `10.10.10.0/24`  
+  Purpose: Carries internal lab traffic and VLANs  
+
+The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
+### Internal Network Segmentation
+The following internal networks are defined:
+- **VLAN 10 – EMPLOYEESLAN**  
+  Subnet: `10.10.10.0/24`  
+  Gateway: `10.10.10.254`  
+  DHCP range: `[PLACEHOLDER – confirm range]`  
+  Purpose: Windows workstations and user activity
+
+- **VLAN 20 – SERVERSLAN**  
+  Subnet: `10.10.20.0/24`  
+  Gateway: `10.10.20.254`  
+  DHCP range: `[PLACEHOLDER – confirm range]`  
+  Purpose: Server-side services and infrastructure
+
+- **VLAN 30 – MANAGEMENTLAN**  
+  Subnet: `10.10.30.0/24`  
+  Gateway: `10.10.30.254`  
+  DHCP range: `[PLACEHOLDER – confirm range]`  
+  Purpose: Management, monitoring, and security components
+
+In addition to VLAN-based segmentation, a dedicated network is used for testing and attack simulation:
+
+- **ATTACKERLAN40**  
+  Subnet: `10.10.40.0/24`  
+  Gateway: `10.10.40.254`  
+  Connection type: Dedicated pfSense interface (`vtnet2`)  
+  DHCP range: `[PLACEHOLDER – confirm range]`  
+  Purpose: Isolated testing host for attack and detection validation
+### Firewall & Routing
+pfSense acts as the central routing and control point for the lab. All internal networks are routed through pfSense, making it responsible for:
+- Inter-VLAN routing
+- Enforcing network isolation
+- Applying firewall policies
+- Serving as the default gateway for all segments
+
+pfSense is connected to:
+- The WAN network via `vtnet0`
+- The internal lab network via `vtnet1` (VLAN trunk)
+- The attacker network via a dedicated interface (`vtnet2`)  
+
+This design allows traffic between internal segments to be explicitly routed and filtered, while also supporting controlled testing of lateral movement, isolation boundaries, and monitoring coverage.
+
+<img src="/resources/Pfsense-net.png" />
+## Traffic Visibility & Mirroring (`tc`)
+
+To solve that, traffic mirroring was implemented on the Proxmox host using Linux **traffic control (`tc`)**. This allows packets traversing the internal bridge (`vmbr1`) to be mirrored to a dedicated monitoring interface.
+
+The mirroring configuration is applied at the bridge level and made persistent using a `systemd service`, ensuring visibility is maintained across reboots.
+
+As a next improvement, the lab will be extended to experiment with **Open vSwitch (OVS)** as an alternative approach to traffic mirroring and network visibility.
