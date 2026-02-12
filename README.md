@@ -89,27 +89,6 @@ pfSense acts as the central routing and control point for the lab. All internal 
 This design allows traffic between internal segments to be explicitly routed and filtered, while also supporting controlled testing of lateral movement, isolation boundaries, and monitoring coverage.
 
 <img src="/resources/Pfsense-net.png" />
-
-## Suricata Configuration and Alert Validation
-
-Once traffic visibility was confirmed at the interface level, the next step was ensuring Suricata was correctly ingesting and processing mirrored traffic.
-
-Suricata was configured to listen on the dedicated monitoring interface:  `enp6s19`
-
-<img src="/resources/suricata-interface.png" />
-
-![[]]
-Suricata configuration is tested before proceeding further:``
-`
-```Bash
-sudo suricata -T -c /etc/suricata/suricata.yaml -v
-```
-
-<img src="/resources/suricata-test.png" />
-
-#### Service validation:
-<img src="/resources/Suricata-Validation.png" />
-
 ## Traffic Mirroring and Network Visibility
   
 While attempting to mirror SPAN traffic to the Suricata IDS, it became apparent that **standard Linux bridges in Proxmox do not support native port mirroring**. This limitation surfaced during testing rather than design, requiring an alternative approach to maintain full network visibility.
@@ -126,7 +105,7 @@ In this lab, the Suricata monitoring interface is `enp6s19`. Visibility was veri
 sudo tcpdump -i enp6s19
 ```
 
-![[]]
+
 <img src="/resources/suricata-mirroed.png" />
 
 To ensure the mirroring remains active after host reboots, the configuration was wrapped in a **systemd service** on the Proxmox host.
@@ -134,4 +113,26 @@ To ensure the mirroring remains active after host reboots, the configuration was
 <img src="/resources/systemd-tc-mirror.png" />
 
 As a future improvement, the lab will explore **Open vSwitch (OVS)** to evaluate its native SPAN and mirroring capabilities compared to the current tc-based solution.
+
+## Suricata Configuration and Alert Validation
+
+Once traffic visibility was confirmed at the interface level, the next step was ensuring Suricata was correctly ingesting and processing mirrored traffic.
+
+Suricata was configured to listen on the dedicated monitoring interface: `enp6s19`
+
+<img src="/resources/suricata-interface.png" />
+
+
+Suricata configuration is tested before proceeding further using the below command
+`
+```Bash
+sudo suricata -T -c /etc/suricata/suricata.yaml -v
+```
+
+<img src="/resources/suricata-test.png" />
+
+#### **Service Validation**
+The Suricata service status was verified to confirm it was actively monitoring the interface:
+<img src="/resources/Suricata-Validation.png" />
+
 
