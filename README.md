@@ -28,7 +28,7 @@ The environment includes:
 - Windows based infrastructure
 - A testing host for experimentation
 
-![SOC Lab Environment](soc_lab_resources/SOC-Lab-Environment.png)
+![SOC Lab Environment](../soc_lab_resources/SOC-Lab-Environment.png)
 
 ## Network Design, Segmentation & Routing
 The lab network is designed to support isolation, controlled communication, and experimentation with visibility and access boundaries. Segmentation is implemented using a combination of Linux bridges, VLANs, and a central firewall/router.
