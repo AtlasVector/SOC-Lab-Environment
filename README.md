@@ -28,7 +28,7 @@ The environment includes:
 - Windows based infrastructure
 - A testing host for experimentation
 
-<img src="../soc_lab resources/SOC-Lab-Environment.png" />
+![[SOC-Lab-Environment.png]]
 
 ## Network Design, Segmentation & Routing
 The lab network is designed to support isolation, controlled communication, and experimentation with visibility and access boundaries. Segmentation is implemented using a combination of Linux bridges, VLANs, and a central firewall/router.
@@ -125,7 +125,7 @@ Suricata was configured to listen on the dedicated monitoring interface: `enp6s1
 
 Suricata configuration is tested before proceeding further using the below command
 `
-```Bash
+```Terminal
 sudo suricata -T -c /etc/suricata/suricata.yaml -v
 ```
 
