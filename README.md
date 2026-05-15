@@ -43,7 +43,7 @@ At the Proxmox level, the environment is built around two primary Linux bridges:
   Subnet: `10.10.10.0/24`  
   Purpose: Carries internal lab traffic and VLANs  
 
-<img src="../soc_lab resources/PVE-NICs.png" />
+![PVE NICs](soc_lab_resources/PVE-NICs.png)
 
 The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
 ### Internal Network Segmentation
@@ -88,14 +88,14 @@ pfSense acts as the central routing and control point for the lab. All internal 
 
 This design allows traffic between internal segments to be explicitly routed and filtered, while also supporting controlled testing of lateral movement, isolation boundaries, and monitoring coverage.
 
-<img src="../soc_lab resources/Pfsense-net.png" />
+![Pfsense Network](soc_lab_resources/Pfsense-net.png)
 ## Traffic Mirroring and Network Visibility
   
 While attempting to mirror SPAN traffic to the Suricata IDS, it became apparent that **standard Linux bridges in Proxmox do not support native port mirroring**. This limitation surfaced during testing rather than design, requiring an alternative approach to maintain full network visibility.
 
 As a workaround, traffic mirroring was implemented at the **virtual NIC (tap interface) level** using Linux **traffic control (`tc`)**. This allowed ingress traffic from the monitored VM interface to be mirrored directly to the Suricata monitoring interface.
 
-<img src="../soc_lab resources/tc-mirroring.png" />
+![TC Mirroring](soc_lab_resources/tc-mirroring.png)
 
 To confirm that traffic was successfully mirrored to the correct interface on the Suricata VM, packet capture was performed directly on the monitoring interface.  
 
@@ -106,11 +106,11 @@ sudo tcpdump -i enp6s19
 ```
 
 
-<img src="../soc_lab resources/suricata-mirroed.png" />
+![Suricata Mirrored](soc_lab_resources/suricata-mirroed.png)
 
 To ensure the mirroring remains active after host reboots, the configuration was wrapped in a **systemd service** on the Proxmox host.
 
-<img src="../soc_lab resources/systemd-tc-mirror.png" />
+![Systemd TC Mirror](soc_lab_resources/systemd-tc-mirror.png)
 
 As a future improvement, the lab will explore **Open vSwitch (OVS)** to evaluate its native SPAN and mirroring capabilities compared to the current tc-based solution.
 
@@ -120,7 +120,7 @@ Once traffic visibility was confirmed at the interface level, the next step was 
 
 Suricata was configured to listen on the dedicated monitoring interface: `enp6s19`
 
-<img src="../soc_lab resources/suricata-interface.png" />
+![Suricata Interface](soc_lab_resources/suricata-interface.png)
 
 
 Suricata configuration is tested before proceeding further using the below command
@@ -129,10 +129,12 @@ Suricata configuration is tested before proceeding further using the below comma
 sudo suricata -T -c /etc/suricata/suricata.yaml -v
 ```
 
-<img src="../soc_lab resources/suricata-test.png" />
+![Suricata Test](soc_lab_resources/suricata-test.png)
 
 #### **Service Validation**
 The Suricata service status was verified to confirm it was actively monitoring the interface:
-<img src="../soc_lab resources/Suricata-Validation.png" />
+
+![Suricata Validation](soc_lab_resources/Suricata-Validation.png)
+
 
 
