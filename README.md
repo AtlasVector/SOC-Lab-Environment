@@ -28,7 +28,7 @@ The environment includes:
 - Windows based infrastructure
 - A testing host for experimentation
 
-<img src="../soc_lab resources/SOC-Lab-Environment.png" />
+![SOC Lab Environment](soc_lab_resources/SOC-Lab-Environment.png)
 
 ## Network Design, Segmentation & Routing
 The lab network is designed to support isolation, controlled communication, and experimentation with visibility and access boundaries. Segmentation is implemented using a combination of Linux bridges, VLANs, and a central firewall/router.
@@ -43,7 +43,7 @@ At the Proxmox level, the environment is built around two primary Linux bridges:
   Subnet: `10.10.10.0/24`  
   Purpose: Carries internal lab traffic and VLANs  
 
-<img src="../soc_lab resources/PVE-NICs.png" />
+![PVE NICs](soc_lab_resources/PVE-NICs.png)
 
 The internal lab network is further segmented using VLANs, which are trunked over `vmbr1` and terminated on pfSense. This allows multiple isolated networks to share the same physical bridge while remaining logically separated.
 ### Internal Network Segmentation
